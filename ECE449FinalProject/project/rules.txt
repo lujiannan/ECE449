@@ -1,0 +1,68 @@
+rules.append(ctrl.Rule(asteroid_direction["IF"] & asteroid_distance["VC"] & asteroid_size["S"], ship_thrust["PL"]))
+rules.append(ctrl.Rule(asteroid_direction["IF"] & asteroid_distance["VC"] & asteroid_size["M"], ship_thrust["NS"]))
+rules.append(ctrl.Rule(asteroid_direction["IF"] & asteroid_distance["VC"] & asteroid_size["L"], ship_thrust["NL"]))
+rules.append(ctrl.Rule(asteroid_direction["IF"] & asteroid_distance["VC"] & asteroid_size["H"], ship_thrust["NL"]))
+
+rules.append(ctrl.Rule(asteroid_direction["IF"] & asteroid_distance["SC"] & asteroid_size["S"], ship_thrust["PL"]))
+rules.append(ctrl.Rule(asteroid_direction["IF"] & asteroid_distance["SC"] & asteroid_size["M"], ship_thrust["NS"]))
+rules.append(ctrl.Rule(asteroid_direction["IF"] & asteroid_distance["SC"] & asteroid_size["L"], ship_thrust["NS"]))
+rules.append(ctrl.Rule(asteroid_direction["IF"] & asteroid_distance["SC"] & asteroid_size["H"], ship_thrust["NS"]))
+
+rules.append(ctrl.Rule(asteroid_direction["FL"] | asteroid_direction["CL"] | asteroid_direction["CR"] | asteroid_direction["FR"], ship_thrust["PS"]))
+
+rules.append(ctrl.Rule(asteroid_direction["FL"], (ship_turn_rate["FL"], fire_bullet["N"])))
+rules.append(ctrl.Rule(asteroid_direction["CL"], (ship_turn_rate["FL"], fire_bullet["N"])))
+rules.append(ctrl.Rule(asteroid_direction["IF"], (ship_turn_rate["AZ"], fire_bullet["Y"])))
+rules.append(ctrl.Rule(asteroid_direction["CR"], (ship_turn_rate["FR"], fire_bullet["N"])))
+rules.append(ctrl.Rule(asteroid_direction["FR"], (ship_turn_rate["FR"], fire_bullet["N"])))
+
+import random
+
+def fitness(chromosome):
+        asteroids_total = 0
+        num = 10
+        for i in num:
+            score = game.run(scenario=my_test_scenario, controllers = [FuzzyController()])
+            asteroids_hit = score.teams[0].asteroids_hit
+            asteroid_total += asteroids_hit
+
+        avg_asteroids = asteroids_total/10
+        return avg_asteroids
+    
+    
+    ga = EasyGA.GA()
+    ga.gene_impl = lambda: generate_chromosome()
+    ga.chromosome_length = 6
+    ga.population_size = 10
+    ga.target_fitness_type = 'max'
+    ga.generation_goal = 5
+    ga.fitness_function_impl = fitness
+    ga.evolve()
+
+def generate_chromosome():
+	min_a = 0
+	max_a = 0.2
+
+	min_b = -1 * math.pi / 6
+	max_b = math.pi / 6
+
+	min_c = 2
+	max_c = 4
+
+	min_d = -36
+	max_d = 36
+
+	min_e = -96
+	max_e = 96
+
+	min_f = -1
+	max_f = 1
+
+	a = random.uniform(min_a, max_a) 
+	b = random.uniform(min_b, max_b) 
+	c = random.uniform(min_c, max_c) 
+	d = random.uniform(min_d, max_d) 
+	e = random.uniform(min_e, max_e) 
+	f = random.uniform(min_f, max_f) 
+	
+	return [a,b,c,d,e,f]
